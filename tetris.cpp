@@ -8,16 +8,16 @@ bool gameOver;
 const int width = 16; 
 const int height = 18;
 int score;
-int field[18][16] = { 0 }; // Updated field size
+int field[18][16] = { 0 }; 
 
 int shapes[7][4][2] = {
-    {{0, 0}, {1, 0}, {2, 0}, {3, 0}},     // I Shape
-    {{0, 0}, {0, 1}, {1, 0}, {1, 1}},     // O Shape
-    {{0, 0}, {1, 0}, {2, 0}, {2, 1}},     // L Shape
-    {{0, 1}, {1, 1}, {2, 1}, {2, 0}},     // J Shape
-    {{0, 1}, {1, 1}, {2, 1}, {1, 0}},     // T Shape
-    {{0, 1}, {1, 1}, {1, 0}, {2, 0}},     // Z Shape
-    {{0, 0}, {1, 0}, {1, 1}, {2, 1}}      // S Shape
+    {{0, 0}, {1, 0}, {2, 0}, {3, 0}},     
+    {{0, 0}, {0, 1}, {1, 0}, {1, 1}},     
+    {{0, 0}, {1, 0}, {2, 0}, {2, 1}},     
+    {{0, 1}, {1, 1}, {2, 1}, {2, 0}},    
+    {{0, 1}, {1, 1}, {2, 1}, {1, 0}},   
+    {{0, 1}, {1, 1}, {1, 0}, {2, 0}},    
+    {{0, 0}, {1, 0}, {1, 1}, {2, 1}}      
 };
 
 struct Point {
@@ -89,7 +89,7 @@ void Draw()
 
                     if (blockX == j && blockY == i)
                     {
-                        cout << "4"; // Display "4" for the falling block
+                        cout << "4"; 
                         isCurrentShapeBlock = true;
                         break;
                     }
@@ -99,7 +99,7 @@ void Draw()
                     cout << " ";
             }
             else
-                cout << "4"; // Display "4" for the settled block
+                cout << "4"; 
 
             if (j == width - 1)
                 cout << "#";
@@ -136,7 +136,6 @@ void RotateShape()
         oldShape[i].y = currentShape.y + shapes[currentShapeNum][i][1];
     }
 
-    // Rotate the shape in place
     for (int i = 0; i < 4; i++)
     {
         int offsetX = oldShape[i].x - currentShape.x;
@@ -147,7 +146,6 @@ void RotateShape()
 
         if (newX < 0 || newX >= width || newY >= height || field[newY][newX] != 0)
         {
-            // Revert to the original shape if rotation is not possible
             return;
         }
 
@@ -214,7 +212,7 @@ void Input()
 int main()
 {
     using namespace std::chrono;
-    milliseconds frameDuration(200); // Adjust the frame duration as needed (doubled from 100 to 200)
+    milliseconds frameDuration(200); 
 
     srand(static_cast<unsigned>(time(0)));
     gameOver = false;
