@@ -1,144 +1,138 @@
 #include <iostream>
-#include <Windows.h>
+#include <cstdlib>
+#include <ctime>
+#include "display.h"
+#include "game_process.h"
 
-//сдвиг курсора кансоли в начало, чтобы не было кинопрёнки
-void gotoxy(int x, int y) {
-	COORD pos = { x, y };
-	HANDLE output = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleCursorPosition(output, pos);
-}
 
 using namespace std;
 
-//размер поля и макс длина змейки
-const int WIDTH = 17;
-const int HEIGHT = 10;
-const int MAX_LEN_SNAKE = (WIDTH - 3) * (HEIGHT - 2);
+int MAX = 2048;
+int board[4][4] = { 0 };
+int step;
+int score;
 
-//направление
-const int UP = 0;
-const int DOWN = 1;
-const int LEFT = 2;
-const int RIGHT = 3;
-
-int snake_dir = UP;
-
-//игра идёт или закончена
-bool isRunning = true;
-
-char map[] =
-"################\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"#              #\n"
-"################\n";
-
-//символ змейки
-char snake = 'O';
-
-//массивы для хранения каждого блока змейки
-int snake_x[MAX_LEN_SNAKE] = {0};
-int snake_y[MAX_LEN_SNAKE] = {0};
-int snake_len = 1;//длина змейки
-//координаты еды
-int food_x = 1 + (rand() % (WIDTH - 3));
-int food_y = 1 + (rand() % (HEIGHT - 3));
-char food = '*';
-
-int main()
-{
-	//определение головы
-	snake_x[0] = WIDTH / 2;
-	snake_y[0] = HEIGHT / 2;
-
-	double  time = clock();//делаем процессорное время(тик)
-	//движение
-	while (isRunning) {
-		if (GetKeyState('A') & 0x8000) {
-			if (snake_dir != RIGHT) {
-				snake_dir = LEFT;
-			}
-		}
-		if (GetKeyState('W') & 0x8000) {
-			if (snake_dir != DOWN) {
-				snake_dir = UP;
-			}
-		}
-		if (GetKeyState('S') & 0x8000) {
-			if (snake_dir != UP) {
-				snake_dir = DOWN;
-			}
-		}
-		if (GetKeyState('D') & 0x8000) {
-			if (snake_dir != LEFT) {
-				snake_dir = RIGHT;
-			}
-		}
-		
+int random_index_generate() {
+    int random_index = rand() % 4;
+    return random_index;
+}
 
 
-		if ((clock() - time) / CLOCKS_PER_SEC >= 0.3) {
-			time = clock();//разрешаем заходить в цикл 1 раз в 1 сек
+int is_win() {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (board[i][j] == MAX) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
-			if (snake_x[0] == food_x && snake_y[0] == food_y) {//увеличение змейки и спавн еды
-				++snake_len;
-				food_x = 1 + (rand() % (WIDTH - 3));
-				food_y = 1 + (rand() % (HEIGHT - 3));
-			}
+int new_random_element() {
+    int random_element = rand() % 10;
+    random_element = (random_element == 0) ? 4 : 2;
+    return random_element;
+}
+//win or lose check
 
-			for (int i = snake_len - 2; i >= 0; --i) {
-				snake_x[i + 1] = snake_x[i];
-				snake_y[i + 1] = snake_y[i];
-			}
-			//направление
-			if (snake_dir == UP) {
-				--snake_y[0];
-			}
-			if (snake_dir == DOWN) {
-				++snake_y[0];
-			}
-			if (snake_dir == LEFT) {
-				--snake_x[0];
-			}
-			if (snake_dir == RIGHT) {
-				++snake_x[0];
-			}
 
-			//окно gameover
-			if (snake_x[0] == 0 || snake_y[0] == 0 || snake_x[0] == WIDTH - 2 || snake_y[0] == HEIGHT - 1) {
-				isRunning = false;
-			}
-			if (GetKeyState('Q') & 0x8000)
-				isRunning = false;
+int game_over() {
+    int is_game_over = 1;
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == 0 || board[i][j + 1] == 0 || board[i][j] == board[i][j + 1]) {
+                is_game_over = 0;
+                break;
+            }
+        }
+    }
+    for (int j = 0; j < 4; j++) {
+        for (int i = 0; i < 3; i++) {
+            if (board[i][j] == 0 || board[i + 1][j] == 0 || board[i][j] == board[i + 1][j]) {
+                is_game_over = 0;
+                break;
+            }
+        }
+    }
+    return is_game_over;
+}
 
-			//пересечение змейки
-			for (int i = 1; i < snake_len; i++) {
-				if (snake_x[0] == snake_x[i] && snake_y[0] == snake_y[i]) {
-					isRunning = false;
-					i = snake_len;
-				}
-			}
+//insert random element
+void add_element() {
+    int index_i3, index_j3;
+    int flag = 0;
+    while (1) {
+        if (flag == 1)break;
+        index_i3 = random_index_generate();
+        index_j3 = random_index_generate();
+        if (board[index_i3][index_j3] == 0) {
+            board[index_i3][index_j3] = new_random_element();
+            flag = 1;
+        }
+    }
+}
 
-			gotoxy(0, 0);
-			cout << "Length: " << snake_len << endl;//вывод лоины змейки
+void title() {
+    cout << "------2048------" << endl;
+    cout << "Rules:" << endl;
+    cout << "Use w(up), s(down), a(left), d(right) keys to move the tiles in certain direction" << ", ";
+    cout << "Use 'q' to exit" << endl;
+    cout << "Double up and merge titles with the same number touch" << endl << endl;
+}
 
-			map[food_y * WIDTH + food_x] = food;
-
-			for (int i = 0; i < snake_len; i++) {
-				map[snake_y[i] * WIDTH + snake_x[i]] = snake;
-			}
-			cout << map;
-			for (int i = 0; i < snake_len; i++) { //очищение змейки с буфера карты
-				map[snake_y[i] * WIDTH + snake_x[i]] = ' ';
-			}
-		}
-	}
-	gotoxy(1, HEIGHT / 2);
-	cout << "YOU SCORE IS " << snake_len;
-	gotoxy(WIDTH, HEIGHT);
+int main() {
+    system("color B9");
+    srand((unsigned)time(NULL));
+    char ch, c;
+    cout << "------2048------" << endl;
+    cout << "Hi! Press any button to start the game or 'q' to exit" << endl;
+    cin >> ch;
+    system("cls");
+    if (ch == 'q') {
+        exit(1);
+    }
+    //initialize board
+    display();
+    while (1) {
+        if (is_win()) {
+            cout << step << " steps" << endl;
+            cout << "!!!YOU WIN!!!" << endl;
+            exit(1);
+        }
+        if (game_over()) {
+            cout << "~~~GAME OVER~~~" << endl;
+            exit(2);
+        }
+        cin >> ch;
+        switch (ch) {
+        case 'w':
+            system("cls");
+            title();
+            move_up();
+            break;
+        case 's':
+            system("cls");
+            title();
+            move_down();
+            break;
+        case 'a':
+            system("cls");
+            title();
+            move_left();
+            break;
+        case 'd':
+            system("cls");
+            title();
+            move_right();
+            break;
+        case 'q':
+            exit(1);
+        default:
+            break;
+        }
+        //show current scores
+        cout << "score: " << score << endl;
+    }
+    return 0;
 }
