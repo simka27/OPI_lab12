@@ -1,0 +1,4 @@
+﻿  Beat_project3.cpp
+C:\Users\Admin\OneDrive\Рабочий стол\Best_project\Beat_project3\Beat_project3.cpp(5,16): warning C4838: Преобразование из "int" в "SHORT" требует сужающего преобразования.
+C:\Users\Admin\OneDrive\Рабочий стол\Best_project\Beat_project3\Beat_project3.cpp(5,19): warning C4838: Преобразование из "int" в "SHORT" требует сужающего преобразования.
+  Beat_project3.vcxproj -> C:\Users\Admin\OneDrive\Рабочий стол\Best_project\x64\Debug\Beat_project3.exe
